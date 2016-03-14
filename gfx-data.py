@@ -1,4 +1,4 @@
-import httplib, json, os, requests, sys, time, urllib2, socorro
+import filecmp, httplib, json, os, requests, sys, time, urllib2, socorro
 from datetime import date, datetime, timedelta
 
 DELTA = str(date.today()-timedelta(days=363))
@@ -32,7 +32,7 @@ def get_json(url):
         json = ''
     return json
 
-def run_socorro(topic):
+def run_socorro(topic, string):
     result = {}
     for platform in PLATFORMS:
         result[platform] = {}
@@ -41,28 +41,49 @@ def run_socorro(topic):
         url = url.replace('PLATFORM', platform)
         json = get_json(url)
         result[platform] = socorro.process_json(json)
-    return socorro.stringify(get_dates(result), result)
+    return socorro.stringify(get_dates(result), result, string)
 
-def write_json(string, filename):
-    path = os.getcwd() + '/data/' + filename
-    f = open(path, 'w')
-    f.write(string)
-    f.close()
+def write_json(string, path):
+    result = ''
+    tempfile = path + '.tmp'
+    temp = open(tempfile, 'w')
+    temp.write(string)
+    temp.close()
+
+    if not os.path.exists(path):
+        f = open(path, 'w')
+        f.write(string)
+        f.close()
+        result = 'Data written to {:s}!'.format(path)
+    else:
+        if not filecmp.cmp(tempfile, path):
+            f = open(path, 'w')
+            f.write(string)
+            f.close()
+            result = 'Data written to {:s}!'.format(path)
+        else:
+            result = 'No new data to write!'
+            
+    os.remove(tempfile)
+    return result
 
 def main(argv):
     string = ''
     filename = ''
     if argv.count('-s') > 0:
-        filename = 'socorro/{:s}.json'.format(argv[argv.index('-s')+1])
-        string = run_socorro(argv[argv.index('-s')+1])
+        topic = argv[argv.index('-s')+1]
+        path = os.getcwd() + '/data/socorro/{:s}.json'.format(topic)
+        if os.path.exists(path):
+            f = open(path).read()
+            string = f.strip('[]')
+        string = run_socorro(topic, string)
     string = string.replace(',}', '}')
     string = string.replace('}{', '},{')
     string = '[' + string + ']'
     try:
-        write_json(string, filename)
-        print 'Data written to {:s}!'.format(filename)
+        print write_json(string, path)
     except:
-        print 'WARN: Failed to write {:s}!'.format(filename)
+        print 'WARN: Failed to write {:s}!'.format(path)
     
 if __name__ == '__main__':
     main(sys.argv[1:])

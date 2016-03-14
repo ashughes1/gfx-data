@@ -17,15 +17,15 @@ def process_json(json):
         result[data['term'][0:10]] = rate
     return result
 
-def stringify(dates, data):
-    string = ''
+def stringify(dates, data, string):
     for i in range(len(dates)):
-        string += '{'
-        string += '"date":"{:s}",'.format(dates[i])
-        for platform in data.keys():
-            if data[platform].has_key(dates[i]):
-                string += '"{:s}":{:.2f},'.format(platform,data[platform][dates[i]])
-            else:
-                string += '"{:s}":0,'.format(platform)
-        string += '}'
+        if string.find(dates[i]) <= 0:
+            string += '{'
+            string += '"date":"{:s}",'.format(dates[i])
+            for platform in data.keys():
+                if data[platform].has_key(dates[i]):
+                    string += '"{:s}":{:.2f},'.format(platform,data[platform][dates[i]])
+                else:
+                    string += '"{:s}":0,'.format(platform)
+            string += '}'
     return string
