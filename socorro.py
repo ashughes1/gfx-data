@@ -1,5 +1,5 @@
 MANIFEST = {
-    'crashes-per-adi':'https://crash-stats.mozilla.com/api/SuperSearch/?&signature=~gfx&signature=~layers&signature=~canvas&date=%3E%3DYYYYMMDD&platform_pretty_version=~PLATFORM&_histogram.date=_cardinality.install_time&_histogram_interval=1d'
+    'crashes-per-adi':'https://crash-stats.mozilla.com/api/SuperSearch/?&signature=~gfx&signature=~layers&signature=~canvas&date=%3E%3D__DATE_START__&date=<%3D__DATE_END__&platform_pretty_version=~PLATFORM&_histogram.date=_cardinality.install_time&_histogram_interval=1d'
 }
 
 def get_url(topic):

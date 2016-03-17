@@ -1,7 +1,6 @@
-import filecmp, httplib, json, os, requests, sys, time, urllib2, socorro
+import filecmp, httplib, json, os, re, requests, sys, time, urllib2, socorro
 from datetime import date, datetime, timedelta
 
-DELTA = str(date.today()-timedelta(days=363))
 PLATFORMS = [
     'Windows XP',
     'Windows Vista',
@@ -21,7 +20,7 @@ def get_dates(data):
                 if d == dates[i]:
                     found = 1
             if found == 0:
-                dates.append(d)    
+                dates.append(d)
     return sorted(dates)
 
 def get_json(url):
@@ -32,12 +31,13 @@ def get_json(url):
         json = ''
     return json
 
-def run_socorro(topic, string):
+def run_socorro(topic, string, date_start, date_end):
     result = {}
     for platform in PLATFORMS:
         result[platform] = {}
         url = socorro.get_url(topic)
-        url = url.replace('YYYYMMDD', DELTA)
+        url = url.replace('__DATE_START__', date_start)
+        url = url.replace('__DATE_END__', date_end)
         url = url.replace('PLATFORM', platform)
         json = get_json(url)
         result[platform] = socorro.process_json(json)
@@ -68,15 +68,27 @@ def write_json(string, path):
     return result
 
 def main(argv):
+    date_start = str(date.today()-timedelta(days=363))
+    date_end = str(date.today())
     string = ''
     filename = ''
+    
+    # Set the start date if one was provided
+    if argv.count('-d') > 0:
+        p = re.compile('^2[0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]$')
+        if p.match(argv[argv.index('-d')+1]):
+            date_start = argv[argv.index('-d')+1]
+        
+    # Run the specified Socorro query, if one was specified
     if argv.count('-s') > 0:
         topic = argv[argv.index('-s')+1]
         path = os.getcwd() + '/data/socorro/{:s}.json'.format(topic)
         if os.path.exists(path):
             f = open(path).read()
             string = f.strip('[]')
-        string = run_socorro(topic, string)
+        string = run_socorro(topic, string, date_start, date_end)
+    
+    # Clean up the resulting JSON so that it is valid 
     string = string.replace(',}', '}')
     string = string.replace('}{', '},{')
     string = '[' + string + ']'
