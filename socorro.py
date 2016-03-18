@@ -1,4 +1,5 @@
 MANIFEST = {
+    'crashes-by-channel':'https://crash-stats.mozilla.com/api/SuperSearch/?&signature=~gfx&signature=~layers&signature=~canvas&date=%3E%3D__DATE_START__&date=<%3D__DATE_END__&release_channel=__RELEASE_CHANNEL__&_histogram.date=_cardinality.install_time&_histogram_interval=1d',
     'crashes-by-platform':'https://crash-stats.mozilla.com/api/SuperSearch/?&signature=~gfx&signature=~layers&signature=~canvas&date=%3E%3D__DATE_START__&date=<%3D__DATE_END__&platform_pretty_version=~__PLATFORM__&_histogram.date=_cardinality.install_time&_histogram_interval=1d',
     'crashes-by-vendor':'https://crash-stats.mozilla.com/api/SuperSearch/?&signature=~gfx&signature=~layers&signature=~canvas&date=%3E%3D__DATE_START__&date=<%3D__DATE_END__&adapter_vendor_id=__VENDOR_ID__&_histogram.date=_cardinality.install_time&_histogram_interval=1d'
 }

@@ -1,6 +1,13 @@
 import filecmp, httplib, json, os, re, requests, sys, time, urllib2, socorro
 from datetime import date, datetime, timedelta
 
+CHANNELS = [
+    'release',
+    'beta',
+    'aurora',
+    'nightly'
+]
+
 PLATFORMS = [
     'Windows XP',
     'Windows Vista',
@@ -42,12 +49,17 @@ def run_socorro(topic, string, date_start, date_end):
     url = socorro.get_url(topic)
     url = url.replace('__DATE_START__', date_start)
     url = url.replace('__DATE_END__', date_end)
+    if url.find('__RELEASE_CHANNEL__') >= 0:
+        for channel in CHANNELS:
+            result[channel] = {}
+            json = get_json(url.replace('__RELEASE_CHANNEL__', channel))
+            result[channel] = socorro.process_json(json)
     if url.find('__PLATFORM__') >= 0:
         for platform in PLATFORMS:
             result[platform] = {}
             json = get_json(url.replace('__PLATFORM__', platform))
             result[platform] = socorro.process_json(json)
-    if url.find('__VENDOR_ID__') >= 0:
+    if url.find('__VENDOR_ID__') >= 0:        
         for vendor in VENDORS.keys():
             result[vendor] = {}
             json = get_json(url.replace('__VENDOR_ID__', VENDORS[vendor]))
