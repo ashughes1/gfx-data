@@ -1,4 +1,7 @@
 #!/bin/bash
-
-DATE=$(date -v-4m +"%Y-%m-%d")
-python ./gfx-data.py -d $DATE -s crashes-per-adi
+source %%path_to_virtualenv%%/bin/activate
+cd %%PATH_TO_VIRTUALENV%%/gfx-data
+DATE=$(date -d last-week +%F)
+echo "Processing data since $DATE..."
+python gfx-data.py -d $DATE -s crashes-per-adi
+deactivate
