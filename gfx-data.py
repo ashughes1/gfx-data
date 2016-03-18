@@ -77,15 +77,15 @@ def write_json(string, path):
         f = open(path, 'w')
         f.write(string)
         f.close()
-        result = 'Data written to {:s}!'.format(path)
+        result = '{:s}: New file added!'.format(path)
     else:
         if not filecmp.cmp(tempfile, path):
             f = open(path, 'w')
             f.write(string)
             f.close()
-            result = 'Data written to {:s}!'.format(path)
+            result = '{:s}: Existing file updated!'.format(path)
         else:
-            result = 'No new data to write!'
+            result = '{:s}: No new data to write!'.format(path)
             
     os.remove(tempfile)
     return result
