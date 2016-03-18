@@ -11,6 +11,12 @@ PLATFORMS = [
     'Linux'
 ]
 
+VENDORS = {
+    'amd':'0x1002',
+    'intel':'0x8086',
+    'nvidia':'0x10de'
+}
+
 def get_dates(data):
     dates = []
     for platform in data.keys():
@@ -33,14 +39,19 @@ def get_json(url):
 
 def run_socorro(topic, string, date_start, date_end):
     result = {}
-    for platform in PLATFORMS:
-        result[platform] = {}
-        url = socorro.get_url(topic)
-        url = url.replace('__DATE_START__', date_start)
-        url = url.replace('__DATE_END__', date_end)
-        url = url.replace('PLATFORM', platform)
-        json = get_json(url)
-        result[platform] = socorro.process_json(json)
+    url = socorro.get_url(topic)
+    url = url.replace('__DATE_START__', date_start)
+    url = url.replace('__DATE_END__', date_end)
+    if url.find('__PLATFORM__') >= 0:
+        for platform in PLATFORMS:
+            result[platform] = {}
+            json = get_json(url.replace('__PLATFORM__', platform))
+            result[platform] = socorro.process_json(json)
+    if url.find('__VENDOR_ID__') >= 0:
+        for vendor in VENDORS.keys():
+            result[vendor] = {}
+            json = get_json(url.replace('__VENDOR_ID__', VENDORS[vendor]))
+            result[vendor] = socorro.process_json(json)
     return socorro.stringify(get_dates(result), result, string)
 
 def write_json(string, path):

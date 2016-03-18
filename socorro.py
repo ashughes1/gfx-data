@@ -1,5 +1,6 @@
 MANIFEST = {
-    'crashes-per-adi':'https://crash-stats.mozilla.com/api/SuperSearch/?&signature=~gfx&signature=~layers&signature=~canvas&date=%3E%3D__DATE_START__&date=<%3D__DATE_END__&platform_pretty_version=~PLATFORM&_histogram.date=_cardinality.install_time&_histogram_interval=1d'
+    'crashes-by-platform':'https://crash-stats.mozilla.com/api/SuperSearch/?&signature=~gfx&signature=~layers&signature=~canvas&date=%3E%3D__DATE_START__&date=<%3D__DATE_END__&platform_pretty_version=~__PLATFORM__&_histogram.date=_cardinality.install_time&_histogram_interval=1d',
+    'crashes-by-vendor':'https://crash-stats.mozilla.com/api/SuperSearch/?&signature=~gfx&signature=~layers&signature=~canvas&date=%3E%3D__DATE_START__&date=<%3D__DATE_END__&adapter_vendor_id=__VENDOR_ID__&_histogram.date=_cardinality.install_time&_histogram_interval=1d'
 }
 
 def get_url(topic):
@@ -22,10 +23,10 @@ def stringify(dates, data, string):
         if string.find(dates[i]) <= 0:
             string += '{'
             string += '"date":"{:s}",'.format(dates[i])
-            for platform in data.keys():
-                if data[platform].has_key(dates[i]):
-                    string += '"{:s}":{:.2f},'.format(platform,data[platform][dates[i]])
+            for key in data.keys():
+                if data[key].has_key(dates[i]):
+                    string += '"{:s}":{:.2f},'.format(key,data[key][dates[i]])
                 else:
-                    string += '"{:s}":0,'.format(platform)
+                    string += '"{:s}":0,'.format(key)
             string += '}'
     return string
