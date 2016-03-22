@@ -92,7 +92,7 @@ def write_json(string, path):
 
 def main(argv):
     date_start = str(date.today()-timedelta(days=363))
-    date_end = str(date.today())
+    date_end = str(date.today()-timedelta(days=1))
     string = ''
     filename = ''
     
